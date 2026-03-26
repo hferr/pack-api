@@ -27,5 +27,19 @@ func (h *Handler) NewRouter() http.Handler {
 	mux.HandleFunc("POST /packs/rebuild", h.RebuildPacks)
 	mux.HandleFunc("POST /packs/calculate-order", h.CalculateMinPackOrder)
 
-	return mux
+	handler := corsMiddleware(mux)
+	return handler
+}
+
+func corsMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+		if r.Method == "OPTIONS" {
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+		next.ServeHTTP(w, r)
+	})
 }
