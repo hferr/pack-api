@@ -40,16 +40,6 @@ This project follows the hexagonal architecture for clean separation of concerns
 
 ## API Endpoints
 
-| Method | Endpoint               | Description                                      |
-| ------ | ---------------------- | ------------------------------------------------ |
-| GET    | /healthcheck           | Health check                                     |
-| GET    | /packs/sizes           | Returns a list of all available pack sizes       |
-| POST   | /packs                 | Create a new pack                                |
-| POST   | /packs/rebuild         | Rebuilds the pack list with the given sizes      |
-| POST   | /packs/calculate-order | Calculates the minimum packs needed for an order |
-
-## API Endpoints
-
 | Method | Endpoint               | Request Body Example   | Response Example           | Description                                            |
 | ------ | ---------------------- | ---------------------- | -------------------------- | ------------------------------------------------------ |
 | GET    | /healthcheck           | -                      | 200 OK                     | Health check (returns 200 OK)                          |
