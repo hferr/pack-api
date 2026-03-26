@@ -10,6 +10,7 @@ import (
 	"github.com/hferr/pack-api/config"
 	"github.com/hferr/pack-api/internal/httpjson"
 	"github.com/hferr/pack-api/internal/repositories/pg"
+	"github.com/hferr/pack-api/migrations"
 )
 
 const fmtDbConnString = "host=%s user=%s password=%s dbname=%s port=%d"
@@ -49,6 +50,10 @@ func initPostgresDb(cfg *config.Cfg) (*sql.DB, error) {
 
 	psql, err := pg.NewPostgresDb(connString)
 	if err != nil {
+		return nil, err
+	}
+
+	if err := migrations.ApplyMigrations(psql.Db); err != nil {
 		return nil, err
 	}
 
