@@ -1,9 +1,21 @@
 package app
 
-import "sort"
+import (
+	"sort"
+
+	"github.com/google/uuid"
+)
 
 type Pack struct {
+	ID   uuid.UUID
 	Size int
+}
+
+func NewPack(size int) *Pack {
+	return &Pack{
+		ID:   uuid.New(),
+		Size: size,
+	}
 }
 
 type Packs []Pack
