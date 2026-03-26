@@ -7,8 +7,8 @@ import (
 )
 
 type Cfg struct {
-	ServerPort int    `env:"SERVER_PORT,default=0.0.0.0"`
-	DBHost     string `env:"DB_HOST,default=postgres"`
+	ServerPort int    `env:"ServerPort,default=8080"`
+	DBHost     string `env:"DB_HOST,default=db"`
 	DBPort     int    `env:"DB_PORT,default=5432"`
 	DBUser     string `env:"DB_USER,default=postgres"`
 	DBPass     string `env:"DB_PASS,default=topsecret"`
