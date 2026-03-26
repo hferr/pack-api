@@ -4,6 +4,7 @@ WORKDIR /app
 RUN apk add --no-cache git
 
 COPY go.mod .
+COPY go.sum .
 
 # Download dependencies
 RUN go mod download
@@ -18,6 +19,9 @@ WORKDIR /app
 
 # Copy the built binary from builder
 COPY --from=builder /app/pack-api .
+
+# Copy migrations if needed
+COPY migrations ./migrations
 
 EXPOSE 8080
 
