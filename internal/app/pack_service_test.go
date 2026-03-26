@@ -77,6 +77,10 @@ func TestCreatePack(t *testing.T) {
 				},
 			},
 		},
+		"validation error creating pack": {
+			wantErr: true,
+			size:    -1,
+		},
 		"error creating pack": {
 			wantErr: true,
 			size:    30,

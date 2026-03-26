@@ -89,6 +89,15 @@ func TestCreatePack(t *testing.T) {
 				},
 			},
 		},
+		"validation error throws bad request": {
+			wantCode: 400,
+			packSize: -1,
+			svs: &mock.PackService{
+				CreatePackFn: func(ctx context.Context, size int) (*app.Pack, error) {
+					return nil, &app.ValidationError{}
+				},
+			},
+		},
 		"internal error": {
 			wantCode: 500,
 			packSize: 300,
@@ -146,6 +155,15 @@ func TestRebuildPacks(t *testing.T) {
 						packs = append(packs, *app.NewPack(i))
 					}
 					return packs, nil
+				},
+			},
+		},
+		"validation error throws bad request": {
+			wantCode: 400,
+			sizes:    []int{200, 300, 400, 0},
+			svs: &mock.PackService{
+				RebuildPacksFn: func(ctx context.Context, sizes []int) (app.Packs, error) {
+					return nil, &app.ValidationError{}
 				},
 			},
 		},
