@@ -18,6 +18,16 @@ func NewPack(size int) *Pack {
 	}
 }
 
+func (p *Pack) Validate() error {
+	if p.Size < 1 {
+		return &ValidationError{
+			Field:   "Size",
+			Message: "has to be greater than 0",
+		}
+	}
+	return nil
+}
+
 type Packs []Pack
 
 func (packs Packs) GetSortedSizes() []int {

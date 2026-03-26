@@ -6,6 +6,15 @@ import (
 	"math"
 )
 
+type ValidationError struct {
+	Field   string
+	Message string
+}
+
+func (e *ValidationError) Error() string {
+	return fmt.Sprintf("Validation error for field: %s, message: %s", e.Field, e.Message)
+}
+
 type PackService interface {
 	ListPacks(ctx context.Context) (Packs, error)
 	CreatePack(ctx context.Context, size int) (*Pack, error)
@@ -29,6 +38,10 @@ func (s *packService) ListPacks(ctx context.Context) (Packs, error) {
 
 func (s *packService) CreatePack(ctx context.Context, size int) (*Pack, error) {
 	pack := NewPack(size)
+	if err := pack.Validate(); err != nil {
+		return nil, err
+	}
+
 	if err := s.repo.CreatePack(ctx, pack); err != nil {
 		return nil, fmt.Errorf("Error while creating pack: %v", err)
 	}
@@ -41,7 +54,12 @@ func (s *packService) RebuildPacks(ctx context.Context, sizes []int) (Packs, err
 	// entries in the packs table and rebuilds it with the new values
 	packs := make(Packs, len(sizes))
 	for i, size := range sizes {
-		packs[i] = *NewPack(size)
+		pack := NewPack(size)
+		if err := pack.Validate(); err != nil {
+			return nil, err
+		}
+
+		packs[i] = *pack
 	}
 
 	if err := s.repo.RebuildPacks(ctx, packs); err != nil {

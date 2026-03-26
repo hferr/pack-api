@@ -47,7 +47,7 @@ const CreatePackQuery = `
 		(id, size)
 	VALUES
 		($1, $2)
-	ON CONFLICT (size) DO NOTHING
+	ON CONFLICT (size) DO UPDATE SET size = EXCLUDED.size
 	RETURNING id
 `
 

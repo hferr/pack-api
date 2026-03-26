@@ -2,6 +2,7 @@ package httpjson
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 
 	"github.com/hferr/pack-api/internal/app"
@@ -34,7 +35,13 @@ func (h *Handler) CreatePack(w http.ResponseWriter, r *http.Request) {
 
 	pack, err := h.packService.CreatePack(r.Context(), req.Size)
 	if err != nil {
-		http.Error(w, "Could not parse request body", http.StatusInternalServerError)
+		var valErr *app.ValidationError
+		if errors.As(err, &valErr) {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		http.Error(w, "Could not create pack", http.StatusInternalServerError)
 		return
 	}
 
@@ -56,6 +63,12 @@ func (h *Handler) RebuildPacks(w http.ResponseWriter, r *http.Request) {
 
 	packs, err := h.packService.RebuildPacks(r.Context(), req.Sizes)
 	if err != nil {
+		var valErr *app.ValidationError
+		if errors.As(err, &valErr) {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
 		http.Error(w, "Could not rebuild packs", http.StatusInternalServerError)
 		return
 	}
