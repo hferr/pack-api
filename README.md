@@ -2,6 +2,12 @@
 
 Golang API for managing Packs, using PostgreSQL for persistence.
 
+## Live
+
+This application is deployed on vercel and render and be accessed here: https://pack-client.vercel.app/
+
+> Note: The free tier of Render spins down the instance due to inactivity so it may take a while to load
+
 ## Quick Start
 
 ### Run with Docker Compose
