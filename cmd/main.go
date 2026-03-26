@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/hferr/pack-api/config"
+	"github.com/hferr/pack-api/internal/app"
 	"github.com/hferr/pack-api/internal/httpjson"
 	"github.com/hferr/pack-api/internal/repositories/pg"
 	"github.com/hferr/pack-api/migrations"
@@ -24,7 +25,13 @@ func main() {
 	}
 	defer db.Close()
 
-	h := httpjson.NewHandler()
+	repo := pg.NewRepo(db)
+
+	packService := app.NewPackService(repo)
+
+	h := httpjson.NewHandler(
+		packService,
+	)
 
 	s := http.Server{
 		Addr:         fmt.Sprintf(":%d", cfg.ServerPort),
