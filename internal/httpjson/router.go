@@ -24,6 +24,7 @@ func (h *Handler) NewRouter() http.Handler {
 
 	mux.HandleFunc("GET /packs/sizes", h.ListPackSizes)
 	mux.HandleFunc("POST /packs", h.CreatePack)
+	mux.HandleFunc("POST /packs/rebuild", h.RebuildPacks)
 	mux.HandleFunc("POST /packs/calculate-order", h.CalculateMinPackOrder)
 
 	return mux

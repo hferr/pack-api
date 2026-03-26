@@ -43,6 +43,30 @@ func (h *Handler) CreatePack(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(pack)
 }
 
+type RebuildPacksRequest struct {
+	Sizes []int `json:"sizes"`
+}
+
+func (h *Handler) RebuildPacks(w http.ResponseWriter, r *http.Request) {
+	var req RebuildPacksRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "Could not parse request body", http.StatusBadRequest)
+		return
+	}
+
+	packs, err := h.packService.RebuildPacks(r.Context(), req.Sizes)
+	if err != nil {
+		http.Error(w, "Could not rebuild packs", http.StatusInternalServerError)
+		return
+	}
+
+	res := buildPacksSizeListResponse(packs)
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(res)
+}
+
 type CalculatePacksForItemsRequest struct {
 	Items int `json:"items"`
 }

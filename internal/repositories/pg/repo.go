@@ -54,3 +54,52 @@ const CreatePackQuery = `
 func (r *Repo) CreatePack(ctx context.Context, pack *app.Pack) error {
 	return r.db.QueryRowContext(ctx, CreatePackQuery, pack.ID, pack.Size).Scan(&pack.ID)
 }
+
+func (r *Repo) RebuildPacks(ctx context.Context, packs app.Packs) error {
+	err := r.RunInTx(ctx, func(tx *sql.Tx) error {
+		if err := r.deleteAllPacks(ctx); err != nil {
+			return err
+		}
+
+		for _, p := range packs {
+			if err := r.CreatePack(ctx, &p); err != nil {
+				return err
+			}
+		}
+
+		return nil
+	})
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+const DeleteAllPacksQuery = `DELETE FROM packs`
+
+func (r *Repo) deleteAllPacks(ctx context.Context) error {
+	_, err := r.db.ExecContext(ctx, DeleteAllPacksQuery)
+	return err
+}
+
+func (r *Repo) RunInTx(ctx context.Context, fn func(*sql.Tx) error) error {
+	tx, err := r.db.BeginTx(ctx, nil)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if p := recover(); p != nil {
+			tx.Rollback()
+			panic(p)
+		} else if err != nil {
+			tx.Rollback()
+		}
+	}()
+	err = fn(tx)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+	return tx.Commit()
+}

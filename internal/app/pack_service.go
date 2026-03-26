@@ -9,6 +9,7 @@ import (
 type PackService interface {
 	ListPacks(ctx context.Context) (Packs, error)
 	CreatePack(ctx context.Context, size int) (*Pack, error)
+	RebuildPacks(ctx context.Context, sizes []int) (Packs, error)
 	CalculateMinPackOrder(ctx context.Context, items int) (map[int]int, error)
 }
 
@@ -33,6 +34,21 @@ func (s *packService) CreatePack(ctx context.Context, size int) (*Pack, error) {
 	}
 
 	return pack, nil
+}
+
+func (s *packService) RebuildPacks(ctx context.Context, sizes []int) (Packs, error) {
+	// For simplicity, RebuildPackages takes in an array of pack sizes, deletes all existing
+	// entries in the packs table and rebuilds it with the new values
+	packs := make(Packs, len(sizes))
+	for i, size := range sizes {
+		packs[i] = *NewPack(size)
+	}
+
+	if err := s.repo.RebuildPacks(ctx, packs); err != nil {
+		return nil, fmt.Errorf("Error occurred while rebuilding packs: %v", err)
+	}
+
+	return s.ListPacks(ctx)
 }
 
 // CalculateMinPack calculates the optimal combination of pack sizes needed to fulfill an order according
