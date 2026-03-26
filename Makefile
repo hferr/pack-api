@@ -6,6 +6,10 @@ build-run:
 run:
 	docker-compose up -d
 
+# Run tests locally
+run-tests:
+	go test ./... -race
+
 # Tidy
 tidy:
 	go mod tidy
