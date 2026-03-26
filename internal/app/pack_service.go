@@ -1,15 +1,38 @@
 package app
 
-import "math"
+import (
+	"context"
+	"fmt"
+	"math"
+)
 
 type PackService interface {
-	CalculateMinPackOrder(packs Packs, items int) map[int]int
+	ListPacks(ctx context.Context) (Packs, error)
+	CreatePack(ctx context.Context, size int) (*Pack, error)
+	CalculateMinPackOrder(ctx context.Context, items int) (map[int]int, error)
 }
 
-type packService struct{}
+type packService struct {
+	repo Repo
+}
 
-func NewPackService() PackService {
-	return &packService{}
+func NewPackService(r Repo) PackService {
+	return &packService{
+		repo: r,
+	}
+}
+
+func (s *packService) ListPacks(ctx context.Context) (Packs, error) {
+	return s.repo.ListPacks(ctx)
+}
+
+func (s *packService) CreatePack(ctx context.Context, size int) (*Pack, error) {
+	pack := NewPack(size)
+	if err := s.repo.CreatePack(ctx, pack); err != nil {
+		return nil, fmt.Errorf("Error while creating pack: %v", err)
+	}
+
+	return pack, nil
 }
 
 // CalculateMinPack calculates the optimal combination of pack sizes needed to fulfill an order according
@@ -20,8 +43,13 @@ func NewPackService() PackService {
 //
 // Returns
 // - map[int]int: map of pack size and quantity
-func (s *packService) CalculateMinPackOrder(packs Packs, items int) map[int]int {
-	return minPacks(packs, items)
+func (s *packService) CalculateMinPackOrder(ctx context.Context, items int) (map[int]int, error) {
+	packs, err := s.repo.ListPacks(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("Error occurred when listing packs: %v", err)
+	}
+
+	return minPacks(packs, items), nil
 }
 
 type State struct {
